@@ -3,6 +3,10 @@
     "build": "pwlapp build --output public"
   },
 
+  {
+  "packageManager": "pnpm@7.5.1"
+},
+
     "$schema": "https://www.schemastore.org/package.json",
     "private": true,
     "type": "module",
