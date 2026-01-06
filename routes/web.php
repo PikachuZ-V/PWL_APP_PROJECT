@@ -1,73 +1,71 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\Auth\NewPasswordController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
-use App\Http\Controllers\AppController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
-// --- 1. HALAMAN PUBLIK (GUEST) ---
-
-// Redirect halaman depan ke login
+// 1. Redirect Root ke Login
 Route::get('/', function () {
-    return redirect('/login');
+    return redirect()->route('login');
 });
 
-// Halaman Login
-Route::get('/login', function () {
-    return Inertia::render('auth/Login');
-})->name('login');
+// 2. Rute Khusus Guest (Belum Login) - Solusi Lupa Password
+Route::middleware('guest')->group(function () {
+    // Halaman Minta Link Reset
+    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+                ->name('password.request');
 
-// Halaman Register
-Route::get('/register', function () {
-    return Inertia::render('auth/Register');
-})->name('register');
+    // Kirim Email Link Reset
+    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+                ->name('password.email');
 
-// Halaman Lupa Password
-Route::get('/forgot-password', function () {
-    return Inertia::render('auth/ForgotPassword');
-})->name('password.request');
+    // Halaman Input Password Baru
+    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+                ->name('password.reset');
 
- Route::get('/admin-preview', function () {
-    return Inertia::render('admin/AdminDashboard');
+    // Simpan Password Baru
+    Route::post('reset-password', [NewPasswordController::class, 'store'])
+                ->name('password.store');
+
+                
 });
 
+// 3. Dashboard Gateway (Pengatur Arah Login)
+Route::get('/dashboard', function () {
+    if (auth()->user()->role === 'admin') {
+        return redirect()->route('admin.dashboard');
+    }
+    return redirect()->route('user.dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-// --- 2. AREA TERPROTEKSI (WAJIB LOGIN) ---
-
-Route::middleware(['auth'])->group(function () {
+// 4. Group Authenticated (Sudah Login)
+Route::middleware(['auth', 'verified'])->group(function () {
     
-    // Dashboard Utama (Controller akan otomatis arahkan ke Admin atau User)
-    Route::get('/dashboard', [AppController::class, 'dashboard'])->name('dashboard');
+    // --- ADMIN ROUTES ---
+    Route::prefix('admin')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+        Route::get('/notifications', [AdminController::class, 'notifications'])->name('admin.notifications');
+        
+        // Rute Manajemen Warga (Tombol Database User)
+        Route::patch('/users/{user}', [AdminController::class, 'updateUser'])->name('admin.users.update');
+    });
 
-    // --- FITUR USER ---
-    // Kirim Laporan Baru
-    Route::post('/reports', [AppController::class, 'storeReport'])->name('reports.store');
-    // Update Profil Sendiri (Nama/HP)
-    Route::patch('/profile/update', [AppController::class, 'updateProfile'])->name('profile.update');
+    // --- REPORT MANAGEMENT (Admin & Petugas) ---
+    Route::patch('/reports/{report}/process', [ReportController::class, 'process'])->name('reports.process');
+    Route::post('/reports/{report}/complete', [ReportController::class, 'complete'])->name('reports.complete');
 
-    // --- FITUR ADMIN ---
-    // Selesaikan Laporan (Upload Bukti)
-    Route::post('/reports/{id}/complete', [AppController::class, 'completeReport'])->name('reports.complete');
-    // Edit Data User (Ganti Status/Nama)
-    Route::patch('/admin/users/{id}', [AppController::class, 'updateUser'])->name('admin.users.update');
+    // --- USER ROUTES ---
+    Route::get('/user/dashboard', [UserController::class, 'index'])->name('user.dashboard');
+    Route::post('/reports', [ReportController::class, 'store'])->name('reports.store');
 
-// Fitur Admin: Ubah status dari Pending ke Proses
-Route::patch('/reports/{id}/process', [AppController::class, 'processReport'])->name('reports.process');
-
+    // --- PROFILE ROUTES (Edit Profil User) ---
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Route Logout (Keluar dari sistem)
-Route::post('/logout', [AppController::class, 'logout'])->name('logout');
-
-
-// --- 3. ROUTE DEVELOPMENT (OPSIONAL) ---
-// Bisa dihapus nanti saat aplikasi sudah live/production
-Route::get('/admin-preview', function () {
-    // Shortcut untuk intip tampilan Admin tanpa login (Data dummy)
-    return Inertia::render('admin/AdminDashboard');
-});
+require __DIR__.'/auth.php';

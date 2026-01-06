@@ -1,85 +1,75 @@
-import Heading from '@/components/heading';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { cn, isSameUrl, resolveUrl } from '@/lib/utils';
-import { edit as editAppearance } from '@/routes/appearance';
-import { edit } from '@/routes/profile';
-import { edit as editPassword } from '@/routes/user-password';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
-const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Profile',
-        href: edit(),
-        icon: null,
-    },
-    {
-        title: 'Password',
-        href: editPassword(),
-        icon: null,
-    },
-    {
-        title: 'Two-Factor Auth',
-        href: #(),
-        icon: null,
-    },
-    {
-        title: 'Appearance',
-        href: editAppearance(),
-        icon: null,
-    },
-];
+// Komponen Heading Sederhana (Pengganti import eksternal)
+const Heading = ({ title, description }: { title: string; description: string }) => (
+    <div className="mb-6">
+        <h2 className="text-2xl font-bold tracking-tight">{title}</h2>
+        <p className="text-gray-500">{description}</p>
+    </div>
+);
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
-    // When server-side rendering, we only render the layout on the client...
-    if (typeof window === 'undefined') {
-        return null;
-    }
+    const { url } = usePage(); // Mengambil URL aktif
 
-    const currentPath = window.location.pathname;
+    // Daftar Menu Sidebar (Gunakan route() standar Laravel)
+    const sidebarNavItems = [
+        {
+            title: 'Profile',
+            href: route('profile.edit'), // Pastikan route ini ada di web.php
+        },
+        {
+            title: 'Password',
+            href: '#', // Placeholder jika belum ada route
+        },
+        {
+            title: 'Appearance',
+            href: '#',
+        },
+        {
+            title: 'Two-Factor Auth',
+            href: '#',
+        },
+    ];
 
     return (
-        <div className="px-4 py-6">
+        <div className="px-4 py-6 md:px-10 max-w-7xl mx-auto">
             <Heading
                 title="Settings"
                 description="Manage your profile and account settings"
             />
 
-            <div className="flex flex-col lg:flex-row lg:space-x-12">
-                <aside className="w-full max-w-xl lg:w-48">
-                    <nav className="flex flex-col space-y-1 space-x-0">
-                        {sidebarNavItems.map((item, index) => (
-                            <Button
-                                key={`${resolveUrl(item.href)}-${index}`}
-                                size="sm"
-                                variant="ghost"
-                                asChild
-                                className={cn('w-full justify-start', {
-                                    'bg-muted': isSameUrl(
-                                        currentPath,
-                                        item.href,
-                                    ),
-                                })}
-                            >
-                                <Link href={item.href}>
-                                    {item.icon && (
-                                        <item.icon className="h-4 w-4" />
-                                    )}
+            <hr className="my-6 border-gray-200" />
+
+            <div className="flex flex-col lg:flex-row lg:space-x-12 lg:space-y-0">
+                <aside className="-mx-4 lg:w-1/5">
+                    <nav className="flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1 pl-4 lg:pl-0 overflow-x-auto">
+                        {sidebarNavItems.map((item) => {
+                            // Cek apakah menu ini sedang aktif
+                            const isActive = url.startsWith(new URL(item.href, 'http://localhost').pathname);
+                            
+                            return (
+                                <Link
+                                    key={item.title}
+                                    href={item.href}
+                                    className={`
+                                        justify-start text-left px-3 py-2 rounded-md text-sm font-medium transition-colors block
+                                        ${isActive 
+                                            ? 'bg-gray-100 text-gray-900 font-bold' 
+                                            : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'}
+                                    `}
+                                >
                                     {item.title}
                                 </Link>
-                            </Button>
-                        ))}
+                            );
+                        })}
                     </nav>
                 </aside>
 
-                <Separator className="my-6 lg:hidden" />
-
-                <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-12">
+                <div className="flex-1 lg:max-w-2xl">
+                    <div className="bg-white p-6 shadow-sm rounded-lg border border-gray-100">
                         {children}
-                    </section>
+                    </div>
                 </div>
             </div>
         </div>

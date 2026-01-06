@@ -30,8 +30,8 @@ export default function Register() {
                     <div className="absolute bottom-10 right-10 w-60 h-60 bg-blue-600 rounded-full blur-[100px] opacity-30"></div>
                     <div className="relative z-10">
                         <div className="flex items-center space-x-3 mb-8">
-                            <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-xl shadow-lg"></div>
-                            <span className="text-xl font-bold tracking-wide">Pengaduan.<span className="text-cyan-400">App</span></span>
+                            <div className="w-10 h-10 bg-gradient-to-tr from-cyan-400 to-blue-600 rounded-xl shadow-lg flex items-center justify-center font-bold text-lg">SL</div>
+                            <span className="text-xl font-bold tracking-wide">Sobat<span className="text-cyan-400">Lapor</span></span>
                         </div>
                         <h1 className="text-4xl font-extrabold leading-tight mb-6">Mulai Perubahan <br /> <span className="text-cyan-400">Dari Sini.</span></h1>
                         <p className="text-slate-400 leading-relaxed">Bergabunglah bersama kami untuk menciptakan lingkungan yang lebih baik.</p>

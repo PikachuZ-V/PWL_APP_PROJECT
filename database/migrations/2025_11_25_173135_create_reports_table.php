@@ -9,33 +9,24 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up(): void
+   public function up()
 {
     Schema::create('reports', function (Blueprint $table) {
-        $table->id(); // Membuat kolom ID (Primary Key) otomatis
-        
-        // Relasi: Kolom ini menyimpan ID milik User yang melapor
+        $table->id();
         $table->foreignId('user_id')->constrained()->onDelete('cascade');
-        
-        $table->string('title');        // Judul Laporan
-        $table->text('description');    // Isi Laporan Panjang
-        $table->date('date_incident');  // Tanggal Kejadian
-        $table->string('image_path')->nullable(); // Lokasi file foto
-        
-        // Koordinat Peta
+        $table->string('title');
+        $table->text('description');
         $table->string('latitude')->nullable();
         $table->string('longitude')->nullable();
-        
-        // Status Laporan (Pilihan: Pending, Proses, Selesai)
+        $table->json('images')->nullable(); // MENYIMPAN ARRAY FOTO (MULTI IMAGE)
         $table->enum('status', ['Pending', 'Proses', 'Selesai'])->default('Pending');
         
         // Data Penyelesaian (Diisi Admin nanti)
-        $table->text('resolution_note')->nullable();
-        $table->string('resolution_image_path')->nullable();
-        $table->timestamp('resolved_at')->nullable();
-        $table->string('resolved_by')->nullable();
-        
-        $table->timestamps(); // Membuat kolom created_at dan updated_at
+        $table->text('completion_note')->nullable();
+        $table->string('completion_image')->nullable();
+        $table->timestamp('completed_at')->nullable();
+
+        $table->timestamps();
     });
 }
 

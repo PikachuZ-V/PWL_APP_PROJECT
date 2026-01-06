@@ -2,41 +2,40 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Report extends Model
 {
+    // Tambahkan semua kolom agar bisa diisi oleh Controller
+    protected $fillable = [
+        'user_id', 
+        'title', 
+        'description', 
+        'location_address', 
+        'date_incident', 
+        'latitude', 
+        'longitude', 
+        'images', 
+        'status', 
+        'urgency',
+        'completion_note',
+        'completion_images',
+        'completed_at'
+    ];
     use HasFactory;
 
-    // --- BAGIAN PENTING YANG MENGATASI ERROR TADI ---
-    // $guarded = ['id'] artinya: "Semua kolom BOLEH diisi kecuali ID".
-    // Ini adalah cara paling cepat mengatasi MassAssignmentException.
-    protected $guarded = ['id']; 
+    protected $guarded = ['id'];
 
-    // Ubah format tanggal otomatis jadi objek Carbon
+    // PENTING: Agar foto bisa disimpan & diambil sebagai Array
     protected $casts = [
-        'date_incident' => 'date',
-        'resolved_at' => 'datetime',
+        'images' => 'array',
+        'completed_at' => 'datetime',
+        'completion_images' => 'array',
     ];
 
-    // Relasi: Laporan milik 1 User
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    // --- FITUR TAMBAHAN: URL GAMBAR ---
-    // Ini agar di Frontend React, kita bisa panggil .image_url langsung
-    protected $appends = ['image_url', 'resolution_image_url'];
-
-    public function getImageUrlAttribute()
-    {
-        return $this->image_path ? asset('storage/' . $this->image_path) : null;
-    }
-
-    public function getResolutionImageUrlAttribute()
-    {
-        return $this->resolution_image_path ? asset('storage/' . $this->resolution_image_path) : null;
     }
 }

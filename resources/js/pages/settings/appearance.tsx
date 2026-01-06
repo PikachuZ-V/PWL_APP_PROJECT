@@ -1,34 +1,23 @@
-import { Head } from '@inertiajs/react';
-
-import AppearanceTabs from '@/components/appearance-tabs';
-import HeadingSmall from '@/components/heading-small';
-import { type BreadcrumbItem } from '@/types';
-
-import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { edit as editAppearance } from '@/routes/appearance';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Appearance settings',
-        href: editAppearance().url,
-    },
-];
+import { Head } from '@inertiajs/react';
 
 export default function Appearance() {
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Appearance settings" />
-
-            <SettingsLayout>
-                <div className="space-y-6">
-                    <HeadingSmall
-                        title="Appearance settings"
-                        description="Update your account's appearance settings"
-                    />
-                    <AppearanceTabs />
+        <SettingsLayout>
+            <Head title="Appearance" />
+            
+            <div className="space-y-6">
+                <div>
+                    <h3 className="text-lg font-medium">Appearance</h3>
+                    <p className="text-sm text-muted-foreground">
+                        Customize the look and feel of the application.
+                    </p>
                 </div>
-            </SettingsLayout>
-        </AppLayout>
+
+                <div className="p-4 bg-white shadow sm:rounded-lg border">
+                    <p className="text-gray-500">Pengaturan tema (Dark/Light Mode) akan ada di sini.</p>
+                </div>
+            </div>
+        </SettingsLayout>
     );
 }

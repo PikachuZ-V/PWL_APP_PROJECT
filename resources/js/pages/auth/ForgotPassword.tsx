@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm, Link } from '@inertiajs/react';
 
 export default function ForgotPassword({ status }: { status?: string }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -8,56 +8,63 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Kirim ke route standar Laravel 'password.email'
-        post(route('password.email')); 
+        post(route('password.email'));
     };
 
     return (
         <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
             <Head title="Lupa Password" />
 
-            <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row h-[500px]">
-                <div className="w-full md:w-1/2 bg-slate-900 text-white p-12 flex flex-col justify-between relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-40 h-40 bg-indigo-500 rounded-full blur-[80px] opacity-20"></div>
-                    <div className="relative z-10">
-                        <h1 className="text-3xl font-extrabold leading-tight mb-4">Jangan Panik. <br /> <span className="text-cyan-400">Kami Bantu Pulihkan.</span></h1>
-                        <p className="text-slate-400 font-light">Masukkan email Anda, dan kami akan mengirimkan link reset password.</p>
-                    </div>
-                </div>
-
-                <div className="w-full md:w-1/2 bg-white p-12 flex flex-col justify-center">
-                    <div className="mb-8">
-                        <h2 className="text-2xl font-bold text-slate-800 mb-2">Lupa Password?</h2>
+            <div className="w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl p-10 md:p-12 border border-slate-50 relative overflow-hidden">
+                {/* Efek Background Halus */}
+                <div className="absolute -top-24 -left-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl"></div>
+                
+                <div className="relative z-10 text-center">
+                    <div className="flex justify-center mb-8">
+                        <div className="w-16 h-16 bg-slate-900 text-white rounded-2xl flex items-center justify-center text-2xl font-black shadow-xl">SL</div>
                     </div>
 
-                    {/* Alert Sukses dari Backend */}
+                    <h2 className="text-3xl font-bold text-slate-800 mb-4">Lupa Password?</h2>
+                    <p className="text-slate-500 text-sm leading-relaxed mb-8">
+                        Jangan khawatir. Masukkan alamat email Anda dan kami akan mengirimkan link reset password untuk membuat yang baru.
+                    </p>
+
                     {status && (
-                        <div className="mb-4 font-medium text-sm text-green-600 bg-green-50 p-3 rounded-lg border border-green-200">
+                        <div className="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl text-sm font-bold text-emerald-600 animate-fade-in">
                             {status}
                         </div>
                     )}
 
-                    <form onSubmit={submit} className="space-y-6">
+                    <form onSubmit={submit} className="space-y-6 text-left">
                         <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-2" htmlFor="email">Email Terdaftar</label>
-                            <input type="email" id="email" className="w-full px-5 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all" value={data.email} onChange={(e) => setData('email', e.target.value)} required autoFocus />
-                            {errors.email && <div className="text-red-500 text-xs mt-1">{errors.email}</div>}
+                            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest ml-2 mb-2 italic">Alamat Email Terdaftar</label>
+                            <input 
+                                type="email" 
+                                className="w-full px-6 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:outline-none focus:ring-4 focus:ring-cyan-100 font-bold transition-all"
+                                placeholder="contoh@email.com"
+                                value={data.email} 
+                                onChange={(e) => setData('email', e.target.value)} 
+                                required 
+                            />
+                            {errors.email && <div className="text-red-500 text-xs mt-2 ml-2 font-bold">{errors.email}</div>}
                         </div>
 
-                        <button type="submit" disabled={processing} className="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all disabled:opacity-50">
-                            {processing ? 'Mengirim...' : 'Kirim Link Reset'}
+                        <button 
+                            type="submit" 
+                            disabled={processing} 
+                            className="w-full bg-slate-900 hover:bg-cyan-600 text-white font-black py-5 rounded-2xl shadow-xl transition-all transform active:scale-95 disabled:opacity-50 uppercase tracking-widest text-[10px]"
+                        >
+                            {processing ? 'Mengirim Link...' : 'Kirim Link Reset ✨'}
                         </button>
                     </form>
 
-                    <div className="mt-8 text-center">
-                        <p className="text-slate-500 text-sm">Ingat password Anda? <Link href="/login" className="text-slate-800 font-bold hover:text-cyan-600 hover:underline">Kembali Login</Link></p>
+                    <div className="mt-10 border-t pt-8">
+                        <Link href={route('login')} className="text-slate-400 text-sm font-bold hover:text-slate-800 transition-all">
+                            ← Kembali ke Halaman Login
+                        </Link>
                     </div>
                 </div>
             </div>
         </div>
     );
-}
-
-function route(arg0: string): string {
-    throw new Error('Function not implemented.');
 }
